@@ -1,1 +1,128 @@
-<p>superheroes works!</p>
+<button id="add-button" class="btn btn-primary btn-sm">Přidej záznam</button>
+<div id="form">
+    <form [formGroup]="superheroForm" (ngSubmit)="onSubmit()">
+        <!-- CLOSE BUTTON -->
+        <button id="close-form" type="button" class="close" data-dismiss="alert" aria-label="Close" style="padding-bottom: 10px;">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        <!-- NAME -->
+        <div formGroupName="name">
+            <!-- FIRST NAME -->
+            <label>
+                <input type="text"
+                       class="form-control"
+                       placeholder="First name"
+                       formControlName="firstName">               
+            </label><br>
+            <!-- LAST NAME -->
+            <label>
+                <input type="text"
+                       class="form-control"
+                       placeholder="Last name"
+                       formControlName="lastName"> 
+            </label>          
+        <br>              
+        </div>
+        <!-- DATE OF BIRTH -->
+        <label>
+            <input type="text"
+                class="form-control"
+                placeholder="Date of birth"
+                formControlName="dateOfBirth"> 
+        </label>
+        <br>
+        <!-- SUPERPOWER -->
+        <label>
+            <input type="text"
+                class="form-control"
+                placeholder="Superpowers"
+                formControlName="superPowers"> 
+        </label>
+        <!-- FIRST NAME VALIDATOR -->
+            <div class="alert alert-danger" 
+                 *ngIf="firstName.invalid && (firstName.dirty || firstName.touched)" >
+                <div *ngIf="firstName.errors.minlength">
+                    The name must contain at least 3 characters
+                </div>
+                <div *ngIf="firstName.errors.required">
+                    The name must be filled in
+                </div>
+            </div>
+            <!-- LAST NAME VALIDATOR -->
+            <div class="alert alert-danger" 
+                 *ngIf="lastName.invalid && (lastName.dirty || lastName.touched)" >
+                <div *ngIf="lastName.errors.minlength">
+                    Last name must contain at least 3 characters
+                </div>
+                <div *ngIf="lastName.errors.required">
+                    Last name must be filled in
+                </div>
+            </div>
+        <!-- DATE VALIDATOR -->
+            <div class="alert alert-danger" 
+                 *ngIf="dateOfBirth.invalid && (dateOfBirth.dirty || dateOfBirth.touched)" >
+                <div *ngIf="dateOfBirth.errors.required">
+                    Date must be filled in
+                </div>
+                 <div *ngIf="dateOfBirth.errors.pattern">
+                    Date must be in the format dd.mm.yyyy
+                </div>
+            </div>
+        <!-- SUPERPOWER VALIDATOR -->
+            <div class="alert alert-danger" 
+                 *ngIf="superPowers.invalid && (superPowers.dirty || superPowers.touched)" >
+                <div *ngIf="superPowers.errors.minlength">
+                    Superpower must contain at least 3 characters
+                </div>
+                <div *ngIf="superPowers.errors.required">
+                    Superpower must be filled in
+                </div>
+            </div>
+        <br>
+        <button type="submit" id='form-submit' >Add superhero</button><!--[disabled]='!astronautForm.valid'-->
+        <button type="button" id='form-update'
+                style="visibility: hidden">Update superhero</button>
+    </form>
+</div>
+<div id='table'>
+    <table class='table table-hover table-striped'>
+      <thead class="thead-light">
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">First name</th>
+          <th scope="col">Last name</th>
+          <th scope="col">Superhero name</th>
+          <th scope="col">Date of birth</th>
+          <th scope="col">Superpowers</th>
+          <th scope="col">Edit</th>
+          <th scope="col">Delete</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr scope="row" *ngFor="let superhero of superheroes;">
+          <td>{{superhero.id}}</td>
+          <td>{{superhero.firstName}}</td>
+          <td>{{superhero.lastName}}</td>
+          <td>{{superhero.superheroName}}</td>
+          <td>{{superhero.dateOfBirth}}</td>
+          <td>{{superhero.superPowers}}</td>
+          <td>
+              <button class="update-button" type="button">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                  <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                  <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+                </svg>
+              </button>
+          </td>
+          <td>
+              <button class="delete-button" type="button">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                 <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                 <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                </svg>
+              </button>
+          </td>      
+        </tr>
+      </tbody>
+    </table>
+</div>

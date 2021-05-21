@@ -1,0 +1,45 @@
+:host {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 10px;
+}
+#add-button {
+    align-self: flex-start;
+    max-width: 160px;
+    height: 38px;
+}
+#table {
+    align-self: center;
+    padding: 10px;
+    border: 1px solid #888888;
+    border-radius: 3px;
+    height: auto;
+    width: 100%;
+}
+
+#form {
+    border: 1px solid #888888;
+    border-radius: 5px;
+    padding: 10px;
+    background-color: wheat;
+    position: absolute;
+    left: calc(50% - 120px);
+    width: 240px;
+    visibility: hidden;
+}
+
+td {
+    line-height: 8px;
+    font-size: 13px;
+}
+
+@media (max-width: 600px) {
+    app-table {
+        font-size: 8px;
+    }
+    td, th {
+        font-size: 8px;
+    }
+    
+}

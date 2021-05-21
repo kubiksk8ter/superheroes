@@ -12,6 +12,7 @@ const typeDefs = gql`
        id: ID!,
        firstName: String,
        lastName: String,
+       superheroName: String,
        dateOfBirth: String,
        superPowers: String
     }
@@ -19,12 +20,13 @@ const typeDefs = gql`
        createSuperhero(
             firstName: String,
             lastName: String,
+            superheroName: String,
             dateOfBirth: String,
             superPower: String
        ):Superhero
     }
 `;
-let idcount = db.superheroes.length; console.log(idcount);
+let idcount = db.superheroes.length;
 const resolvers = {
     Query: {
         superheroes: () => db.superheroes
@@ -35,6 +37,7 @@ const resolvers = {
                 id: `${1 + idcount}`,
                 firstName: args.firstName,
                 lastName: args.lastName,
+                superheroName: args.superheroName,
                 dateOfBirth: args.dateOfBirth,
                 superPower: args.superPower
             };
