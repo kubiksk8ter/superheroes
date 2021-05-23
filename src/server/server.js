@@ -1,15 +1,38 @@
 const express = require('express');
+const { PrismaClient } = require('@prisma/client');
 const { ApolloServer, gql } = require('apollo-server-express');
 const fs = require ('fs');
-const db = require('./db');
- 
+//PRISMA
+const prisma = new PrismaClient();
+async function main() {
+    /*
+  	const allSuperheroes = await prisma.superhero.findMany()
+	const newSuperhero = await prisma.superhero.create({
+      		data: {
+         		firstName: 'Kuba',
+          		lastName: 'Kubikula',
+          		superheroName: 'Kubulus',
+          		dateOfBirth: '11.12.1986',
+          		superPowers: 'xxx'
+      		}
+  	});
+  	console.log(allSuperheroes);
+     */}
+main()
+  	.catch(e => {
+    	throw e;
+  	})
+.finally(async () => {
+    	await prisma.$disconnect()
+});
+
 const typeDefs = gql`
     type Query {
         superheroes:[Superhero]
         superhero(id:ID):Superhero
     }
     type Superhero {
-       id: ID!,
+       id:ID!
        firstName: String,
        lastName: String,
        superheroName: String,
@@ -25,36 +48,52 @@ const typeDefs = gql`
             superPowers: String
        ):Superhero
        deleteSuperhero (id:ID!): Superhero
+       updateSuperhero (id:ID!): Superhero
     }
 `;
-let idcount = db.superheroes.length;
 const resolvers = {
     Query: {
-        superheroes: () => db.superheroes
+        //info: () => 'This is the API of a Superheroes UX',
+        superheroes: async (parent, args, context) => {
+            return context.prisma.superhero.findMany();
+        }
     },
     Mutation: {
-        createSuperhero: (parent, args) => {
-            let ID = parseInt(1 + idcount++);
-            const superhero = {
-                id: ID,
+        createSuperhero: (parent, args, context, info) => {
+            const newSuperhero = context.prisma.superhero.create({
+                data: {
                 firstName: args.firstName,
                 lastName: args.lastName,
                 superheroName: args.superheroName,
                 dateOfBirth: args.dateOfBirth,
                 superPowers: args.superPowers
-            };
-            db.superheroes.push(superhero);
-            return db.superheroes;
+                }
+            })  
+            return newSuperhero;
         },
-        deleteSuperhero: (parent,{id}) => {
+        deleteSuperhero: (parent,{id}, context, info) => {
             let ID = parseInt(id);
-            db.superheroes = db.superheroes.filter((Superhero) => Superhero.id !== ID);
-            return id;
+            const superhero = context.prisma.superhero.delete({where: {
+                id:ID
+            }});
+            return superhero;
         }
+        /* 
+        updateSuperhero: (parent, {id}, context) => {
+            let ID = parseInt(id);
+            const superhero = context.prisma.superhero.
+        }
+        */       
     }
 };
 
-const server = new ApolloServer({ typeDefs, resolvers });
+const server = new ApolloServer({ 
+    typeDefs,
+    resolvers,
+    context: {
+    prisma
+  }
+});
  
 const app = express();
 server.applyMiddleware({ app });

@@ -7,8 +7,8 @@ import {Superhero} from '../superheroes/superhero';
 const GET_SUPERHEROES = gql`
     {
         superheroes {
-            __typename
             id
+            __typename
             firstName
             lastName
             superheroName
