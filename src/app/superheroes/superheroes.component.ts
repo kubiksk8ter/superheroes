@@ -1,16 +1,19 @@
-import { Component, OnInit, Renderer2 } from '@angular/core';
+import { Component, OnInit, Renderer2, ElementRef, AfterViewInit, ViewChild } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import {Apollo, gql} from 'apollo-angular';
 import {Superhero} from '../superheroes/superhero';
 
-const CREATE_SUPERHERO = gql`
-    mutation CreateSuperhero {
-        createSuperhero {
+const GET_SUPERHEROES = gql`
+    {
+        superheroes {
+            __typename
+            id
             firstName
             lastName
+            superheroName
             dateOfBirth
-            superPower
+            superPowers
         }
     }
 `;
@@ -20,7 +23,12 @@ const CREATE_SUPERHERO = gql`
   templateUrl: './superheroes.component.html',
   styleUrls: ['./superheroes.component.css']
 })
-export class SuperheroesComponent implements OnInit { 
+export class SuperheroesComponent implements OnInit, AfterViewInit { 
+     @ViewChild("addButton") addButton: ElementRef;
+     @ViewChild("form") form: ElementRef;
+     @ViewChild("closeButton") closeButton: ElementRef;
+     @ViewChild("confirmButton") confirmButton: ElementRef;
+    
      superheroes: Superhero[];
      private querySubscription: Subscription;
      //apollo
@@ -31,7 +39,8 @@ export class SuperheroesComponent implements OnInit {
      superheroForm = this.fb.group({
          name: this.fb.group({
              firstName: ['', [Validators.required, Validators.minLength(3)]],
-             lastName: ['', [Validators.required, Validators.minLength(3)]]
+             lastName: ['', [Validators.required, Validators.minLength(3)]],
+             superheroName: ['', [Validators.required, Validators.minLength(3)]]
          }),
          dateOfBirth: ['', [Validators.required, Validators.pattern(/^(0[1-9]|[12][0-9]|3[01])\.(0[1-9]|1[012])\.\d{4}$/)]],
          superPowers: ['', [Validators.required, Validators.minLength(3)]]
@@ -47,18 +56,23 @@ export class SuperheroesComponent implements OnInit {
   get lastName() {return this.superheroForm.get('name').get('lastName'); }
   get dateOfBirth() {return this.superheroForm.get('dateOfBirth'); }
   get superPowers() {return this.superheroForm.get('superPowers'); }
+  get superheroName() {return this.superheroForm.get('name').get('superheroName'); }
   
   setFirstName(firstName: string) {this.superheroForm.get('name').get('firstName').setValue(firstName); }
   setLastName(lastName: string) {this.superheroForm.get('name').get('lastName').setValue(lastName); }
   setDateOfBirth(dateOfBirth: string) {this.superheroForm.get('dateOfBirth').setValue(dateOfBirth); }
   setSuperPowers(superPowers: string) {this.superheroForm.get('superPowers').setValue(superPowers); }
+  setSuperheroName(superheroName: string) {this.superheroForm.get('name').get('superheroName').setValue(superheroName); }
 
   ngOnInit() { 
+        
+  }
+  ngAfterViewInit(){
      this.refreshSuperheroes();         
-     this.addAddButtonListener();   
+     this.addAddButtonListener();
   }
   
-  ngOnDestroy() {
+  ngOnDestroy() {      
     this.querySubscription.unsubscribe();
   }
   
@@ -74,14 +88,16 @@ export class SuperheroesComponent implements OnInit {
                 {createSuperhero(
                     firstName: "${this.superheroForm.get('name').get('firstName').value}",
                     lastName: "${this.superheroForm.get('name').get('lastName').value}",
+                    superheroName: "${this.superheroForm.get('name').get('superheroName').value}",
                     dateOfBirth: "${this.superheroForm.get('dateOfBirth').value}",
                     superPowers: "${this.superheroForm.get('superPowers').value}"
                     )
-                { firstName }
+                { superheroName }
             }`
-          }).subscribe(data => {
-              console.log(`Entity superhero ${this.superheroForm.get('name').get('firstName').value}
-              succsessfully created!`);
+          }).subscribe((result: any) => {
+              console.log(`Superhero succsessfully created!`);
+              this.refreshSuperheroes();
+              this.superheroForm.reset();                       
           });  
       
       
@@ -89,32 +105,28 @@ export class SuperheroesComponent implements OnInit {
       this.api.addAstronaut(astronaut).subscribe(data => {
           console.log(data);         
       });
-      */
-          
-      this.superheroForm.reset(); 
-      this.refreshSuperheroes();         
+      */                  
   }
   
-  addAddButtonListener() {
-      const form = document.getElementById('form');
-      const button = document.getElementById('add-button');
-      const buttonClose = document.getElementById('close-form');
-      const buttonConfirm = document.getElementById('form-submit');
-      
-      this.renderer.listen(button, 'click', ()=>{
-          this.renderer.setStyle(form, 'visibility', 'visible');          
-          this.renderer.setStyle(buttonConfirm, 'visibility', 'visible');
+  addAddButtonListener() {      
+      this.renderer.listen(this.addButton.nativeElement, 'click', ()=>{
+          this.renderer.setStyle(this.form.nativeElement, 'visibility', 'visible');          
+          this.renderer.setStyle(this.confirmButton.nativeElement, 'visibility', 'visible');
+            this.setFirstName('Kuba');
+            this.setLastName('Kubula');
+            this.setSuperheroName('Kubulus');
+            this.setDateOfBirth('11.12.1986');
+            this.setSuperPowers('super coder');
+      });
+      this.renderer.listen(this.confirmButton.nativeElement, 'click', ()=>{
+          this.renderer.setStyle(this.form.nativeElement, 'visibility', 'hidden');
+          this.renderer.setStyle(this.confirmButton.nativeElement, 'visibility', 'hidden');
+      });
+      this.renderer.listen(this.closeButton.nativeElement, 'click', ()=>{
+          this.renderer.setStyle(this.form.nativeElement, 'visibility', 'hidden');
+          this.renderer.setStyle(this.confirmButton.nativeElement, 'visibility', 'hidden');
           this.superheroForm.reset();
-      });
-      this.renderer.listen(buttonConfirm, 'click', ()=>{
-          this.renderer.setStyle(form, 'visibility', 'hidden');
-          this.renderer.setStyle(buttonConfirm, 'visibility', 'hidden');
-      });
-      this.renderer.listen(buttonClose, 'click', ()=>{
-          this.renderer.setStyle(form, 'visibility', 'hidden');
-          this.renderer.setStyle(buttonConfirm, 'visibility', 'hidden');
-          this.superheroForm.reset();
-      });
+      });             
   }
   
   //error
@@ -124,30 +136,30 @@ export class SuperheroesComponent implements OnInit {
   
   refreshSuperheroes() {
       this.apollo
-      .watchQuery({
-        query: gql`
-          {
-            superheroes {
-              id
-              firstName
-              lastName
-              superheroName
-              dateOfBirth
-              superPowers
-            }
-          }
-        `,
+      .query({
+        query: GET_SUPERHEROES,
+        fetchPolicy: 'network-only'
       })
-      .valueChanges.subscribe((result: any) => {
+      .subscribe((result: any) => {
         this.superheroes = result?.data?.superheroes;
         this.loading = result.loading;
         this.error = result.error;
-      });
-      
-      
+      });              
   };
   
-  deleteAstronaut(id: number){
-         
-  };
+  deleteSuperhero(id: number){
+      if(confirm(`Really delete record with id ${id}?`)) {
+      this.apollo.mutate({
+          mutation: gql` mutation 
+                {deleteSuperhero(
+                    id:${id}
+                    )
+                { superheroName }
+            }`
+          }).subscribe(() => {
+              console.log(`Superhero with id ${id} succsessfully deleted!`);
+              this.refreshSuperheroes();                       
+          });  
+      };
+  }
 }

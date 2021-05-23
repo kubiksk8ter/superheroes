@@ -22,8 +22,9 @@ const typeDefs = gql`
             lastName: String,
             superheroName: String,
             dateOfBirth: String,
-            superPower: String
+            superPowers: String
        ):Superhero
+       deleteSuperhero (id:ID!): Superhero
     }
 `;
 let idcount = db.superheroes.length;
@@ -33,16 +34,22 @@ const resolvers = {
     },
     Mutation: {
         createSuperhero: (parent, args) => {
+            let ID = parseInt(1 + idcount++);
             const superhero = {
-                id: `${1 + idcount}`,
+                id: ID,
                 firstName: args.firstName,
                 lastName: args.lastName,
                 superheroName: args.superheroName,
                 dateOfBirth: args.dateOfBirth,
-                superPower: args.superPower
+                superPowers: args.superPowers
             };
             db.superheroes.push(superhero);
             return db.superheroes;
+        },
+        deleteSuperhero: (parent,{id}) => {
+            let ID = parseInt(id);
+            db.superheroes = db.superheroes.filter((Superhero) => Superhero.id !== ID);
+            return id;
         }
     }
 };
