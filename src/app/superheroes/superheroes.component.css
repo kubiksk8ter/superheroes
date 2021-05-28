@@ -4,14 +4,16 @@
     justify-content: center;
     padding: 10px;
 }
+
 #add-button {
     align-self: flex-start;
     max-width: 160px;
     height: 38px;
 }
+
 #table {
     align-self: center;
-    padding: 10px;
+    padding: 5px;
     border: 1px solid #888888;
     border-radius: 3px;
     height: auto;
@@ -28,18 +30,27 @@
     width: 240px;
     visibility: hidden;
 }
+input {
+   max-height: 30px; margin-bottom: -5px;
+}
+.alert-danger {
+   padding: 5px;
+}
 
 td {
     line-height: 8px;
     font-size: 13px;
 }
 
-@media (max-width: 600px) {
-    app-table {
-        font-size: 8px;
-    }
+@media (max-width: 650px) {
     td, th {
         font-size: 8px;
     }
-    
+    #table {
+        padding: 0px;
+        border: none;
+    }
+    :host {
+        padding: 0px;
+    }
 }

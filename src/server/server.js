@@ -48,7 +48,14 @@ const typeDefs = gql`
             superPowers: String
        ):Superhero
        deleteSuperhero (id:ID!): Superhero
-       updateSuperhero (id:ID!): Superhero
+       updateSuperhero (
+            id: ID!,
+            firstName: String,
+            lastName: String,
+            superheroName: String,
+            dateOfBirth: String,
+            superPowers: String,            
+       ): Superhero
     }
 `;
 const resolvers = {
@@ -68,23 +75,31 @@ const resolvers = {
                 dateOfBirth: args.dateOfBirth,
                 superPowers: args.superPowers
                 }
-            })  
+                });  
             return newSuperhero;
         },
         deleteSuperhero: (parent,{id}, context, info) => {
             let ID = parseInt(id);
-            const superhero = context.prisma.superhero.delete({where: {
-                id:ID
-            }});
+            const superhero = context.prisma.superhero.delete({
+                where: { id:ID }
+            });
             return superhero;
-        }
-        /* 
-        updateSuperhero: (parent, {id}, context) => {
-            let ID = parseInt(id);
-            const superhero = context.prisma.superhero.
-        }
-        */       
-    }
+        },
+        updateSuperhero: (parent, args, context, info) => {
+            let ID = parseInt(args.id);
+            const superhero = context.prisma.superhero.update({
+                where: { id: ID },
+                data: {
+                firstName: args.firstName,
+                lastName: args.lastName,
+                superheroName: args.superheroName,
+                dateOfBirth: args.dateOfBirth,
+                superPowers: args.superPowers 
+                }
+            });
+            return superhero;
+        }            
+    }       
 };
 
 const server = new ApolloServer({ 
