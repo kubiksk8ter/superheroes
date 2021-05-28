@@ -7,6 +7,32 @@
         </button>
         <!-- NAME -->
         <div formGroupName="name">
+            <!-- SUPERHERO NAME -->
+            <label><small>Superhero name</small>
+                <input type="text"
+                       class="form-control"
+                       placeholder="Superhero name"
+                       formControlName="superheroName"> 
+            </label>
+            <!-- SUPERHERO NAME VALIDATOR -->
+            <div class="alert-danger small" 
+                 *ngIf="superheroName.invalid && (superheroName.dirty || superheroName.touched)" >
+                <div *ngIf="superheroName.errors.minlength">
+                    Superhero name must contain at least 3 characters
+                </div>
+                <div *ngIf="superheroName.errors.maxlength">
+                    Superhero must contain max 20 characters
+                </div>
+                <div *ngIf="superheroName.errors.required">
+                    Superhero name must be filled in
+                </div>
+                <div *ngIf="superheroName.errors.pattern">
+                    Superhero name must not contain any special characters
+                </div>
+                <div *ngIf="superheroName.errors.superheroNameExists">
+                     This superhero is already created
+                </div>
+            </div>     
             <!-- FIRST NAME -->
             <label><small>First name</small>
                 <input type="text"
@@ -53,32 +79,6 @@
                     Last name must not contain any special characters
                 </div>
             </div>
-            <!-- SUPERHERO NAME -->
-            <label><small>Superhero name</small>
-                <input type="text"
-                       class="form-control"
-                       placeholder="Superhero name"
-                       formControlName="superheroName"> 
-            </label>
-            <!-- SUPERHERO NAME VALIDATOR -->
-            <div class="alert-danger small" 
-                 *ngIf="superheroName.invalid && (superheroName.dirty || superheroName.touched)" >
-                <div *ngIf="superheroName.errors.minlength">
-                    Superhero name must contain at least 3 characters
-                </div>
-                <div *ngIf="superheroName.errors.maxlength">
-                    Superhero must contain max 20 characters
-                </div>
-                <div *ngIf="superheroName.errors.required">
-                    Superhero name must be filled in
-                </div>
-                <div *ngIf="superheroName.errors.pattern">
-                    Superhero name must not contain any special characters
-                </div>
-                <div *ngIf="superheroName.errors.superheroNameExists">
-                     This superhero is already created
-                </div> 
-            </div>
         </div>
         <!-- DATE OF BIRTH -->
         <label><small>Date of birth</small>
@@ -94,7 +94,7 @@
                     Date must be filled in
                 </div>
                 <div *ngIf="dateOfBirth.errors.pattern">
-                    Date must be in the format dd.mm.yyyy
+                    Date must be in the format 'dd.mm.yyyy' or 'yyyyy BC'
                 </div>
             </div>
         <!-- SUPERPOWERS -->
@@ -148,9 +148,9 @@
       <thead class="thead-light">
         <tr>
           <th scope="col">#</th>
-          <th scope="col">First name</th>
-          <th scope="col">Last name</th>
           <th scope="col">Superhero name</th>
+          <th scope="col">First name</th>
+          <th scope="col">Last name</th>         
           <th scope="col">Date of birth</th>
           <th scope="col">Superpowers</th>
           <th scope="col">Edit</th>
@@ -160,9 +160,9 @@
       <tbody>
         <tr scope="row" *ngFor="let superhero of superheroes;">
           <td>{{this.superheroes.indexOf(superhero)+1}}</td>
+          <td><strong>{{superhero.superheroName}}</strong></td>  
           <td>{{superhero.firstName}}</td>
-          <td>{{superhero.lastName}}</td>
-          <td>{{superhero.superheroName}}</td>
+          <td>{{superhero.lastName}}</td>          
           <td>{{superhero.dateOfBirth}}</td>
           <td>{{superhero.superPowers}}</td>
           <td>

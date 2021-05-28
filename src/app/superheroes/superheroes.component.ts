@@ -65,12 +65,12 @@ export class SuperheroesComponent implements OnInit, AfterViewInit {
          }),
          dateOfBirth: ['', [
             Validators.required, 
-            Validators.pattern(/^(0[1-9]|[12][0-9]|3[01])\.(0[1-9]|1[012])\.\d{4}$/)]],
+            Validators.pattern(/^((0[1-9]|[12][0-9]|3[01])\.(0[1-9]|1[012])\.\d{4})$|^(\d{1,5}\sBC)$/)]],
          superPowers: ['', [
             Validators.required, 
             Validators.minLength(3),
             Validators.maxLength(50),
-            Validators.pattern(/^[a-zA-Z' ]+$/)]]
+            Validators.pattern(/^[a-zA-Z', ]+$/)]]
      });
   //Async validator superheroNameExists
   checkIfSuperheroNameExists(superheroName: string): Observable<boolean> {
@@ -140,13 +140,13 @@ export class SuperheroesComponent implements OnInit, AfterViewInit {
   createSuperhero() {
       this.isCreateFormActive = true;      
       this.renderer.setStyle(this.form.nativeElement, 'visibility', 'visible');          
-      /*
+      
       this.setFirstName('Kuba');
       this.setLastName('Kubula');
       this.setSuperheroName('Kubulus');
       this.setDateOfBirth('11.12.1986');
       this.setSuperPowers('super coder'); 
-      */                   
+                        
   }
    
   confirmCreateSuperhero() {
@@ -221,8 +221,8 @@ export class SuperheroesComponent implements OnInit, AfterViewInit {
   }
   
   refreshSuperheroes() {
-      this.apollo
-      .query({
+      this.apollo.
+      query({
         query: GET_SUPERHEROES,
         fetchPolicy: 'network-only'
       })
