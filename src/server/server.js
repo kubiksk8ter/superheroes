@@ -1,6 +1,5 @@
 const { ApolloServer, gql } = require('apollo-server');
 const { PrismaClient } = require('@prisma/client');
-const { bootstrap: bootstrapGlobalAgent } = require('global-agent');
 
 const typeDefs = require('./schema');
 const resolvers = require('./resolvers');
@@ -8,9 +7,6 @@ const resolvers = require('./resolvers');
 const fs = require ('fs');
 const https = require('https');
 const http = require('http');
-
-// Setup global support for environment variable based proxy configuration.
-// bootstrapGlobalAgent();
 
 //PRISMA
 const prisma = new PrismaClient();
@@ -26,7 +22,7 @@ main()
 async function startApolloServer() {
   const configurations = {
     // Note: You may need sudo to run on port 443
-    production: { ssl: true, port: 443, hostname: 'superheroes.jakubholecek.cz' }, //{ ssl: true, port: 443, hostname: 'jakubholecek.cz' }
+    production: { ssl: true, port: 443, hostname: 'superheroes.jakubholecek.cz' },
     development: { ssl: false, port: 4000, hostname: 'localhost' }
   };
 
@@ -59,10 +55,3 @@ async function startApolloServer() {
 }
 
 startApolloServer();
-
-
-/*
-NODE_EXTRA_CA_CERTS=/var/www/superheroes.jakubholecek.cz/ssl/ \
-GLOBAL_AGENT_HTTP_PROXY=http://89.221.222.81:8000 \
-node server.js
-*/
