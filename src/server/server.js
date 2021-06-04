@@ -1,23 +1,20 @@
-const express = require('express');
+const { ApolloServer, gql } = require('apollo-server');
 const { PrismaClient } = require('@prisma/client');
-const { ApolloServer, gql } = require('apollo-server-express');
+const { bootstrap: bootstrapGlobalAgent } = require('global-agent');
+
+const typeDefs = require('./schema');
+const resolvers = require('./resolvers');
+
 const fs = require ('fs');
+const https = require('https');
+const http = require('http');
+
+// Setup global support for environment variable based proxy configuration.
+// bootstrapGlobalAgent();
+
 //PRISMA
 const prisma = new PrismaClient();
-async function main() {
-    /*
-  	const allSuperheroes = await prisma.superhero.findMany()
-	const newSuperhero = await prisma.superhero.create({
-      		data: {
-         		firstName: 'Kuba',
-          		lastName: 'Kubikula',
-          		superheroName: 'Kubulus',
-          		dateOfBirth: '11.12.1986',
-          		superPowers: 'xxx'
-      		}
-  	});
-  	console.log(allSuperheroes);
-     */}
+async function main() {}
 main()
   	.catch(e => {
     	throw e;
@@ -26,95 +23,46 @@ main()
     	await prisma.$disconnect()
 });
 
-const typeDefs = gql`
-    type Query {
-        superheroes:[Superhero]
-        superhero(id:ID):Superhero
-    }
-    type Superhero {
-       id:ID!
-       firstName: String,
-       lastName: String,
-       superheroName: String,
-       dateOfBirth: String,
-       superPowers: String
-    }
-    type Mutation {
-       createSuperhero(
-            firstName: String,
-            lastName: String,
-            superheroName: String,
-            dateOfBirth: String,
-            superPowers: String
-       ):Superhero
-       deleteSuperhero (id:ID!): Superhero
-       updateSuperhero (
-            id: ID!,
-            firstName: String,
-            lastName: String,
-            superheroName: String,
-            dateOfBirth: String,
-            superPowers: String,            
-       ): Superhero
-    }
-`;
-const resolvers = {
-    Query: {
-        //info: () => 'This is the API of a Superheroes UX',
-        superheroes: async (parent, args, context) => {
-            return context.prisma.superhero.findMany();
-        }
-    },
-    Mutation: {
-        createSuperhero: (parent, args, context, info) => {
-            const newSuperhero = context.prisma.superhero.create({
-                data: {
-                firstName: args.firstName,
-                lastName: args.lastName,
-                superheroName: args.superheroName,
-                dateOfBirth: args.dateOfBirth,
-                superPowers: args.superPowers
-                }
-                });  
-            return newSuperhero;
-        },
-        deleteSuperhero: (parent,{id}, context, info) => {
-            let ID = parseInt(id);
-            const superhero = context.prisma.superhero.delete({
-                where: { id:ID }
-            });
-            return superhero;
-        },
-        updateSuperhero: (parent, args, context, info) => {
-            let ID = parseInt(args.id);
-            const superhero = context.prisma.superhero.update({
-                where: { id: ID },
-                data: {
-                firstName: args.firstName,
-                lastName: args.lastName,
-                superheroName: args.superheroName,
-                dateOfBirth: args.dateOfBirth,
-                superPowers: args.superPowers 
-                }
-            });
-            return superhero;
-        }            
-    }       
-};
+async function startApolloServer() {
+  const configurations = {
+    // Note: You may need sudo to run on port 443
+    production: { ssl: true, port: 443, hostname: 'superheroes.jakubholecek.cz' }, //{ ssl: true, port: 443, hostname: 'jakubholecek.cz' }
+    development: { ssl: false, port: 4000, hostname: 'localhost' }
+  };
 
-const server = new ApolloServer({ 
+
+  const environment = process.env.NODE_ENV || 'production' ;
+  const config = configurations[environment];
+
+  const server = new ApolloServer({ 
     typeDefs,
     resolvers,
-    context: {
-    prisma
-  }
-});
- 
-const app = express();
-server.applyMiddleware({ app });
- 
-app.listen({ port: 4000 }, () =>
-  console.log('Now browse to http://localhost:4000' + server.graphqlPath)
-);
+    context: { prisma }
+  }); 
+  
+  // Create the HTTPS or HTTP server, per configuration
+  let httpServer;
+  // Make sure these files are secured.
+  httpServer = https.createServer(
+    {
+      key: fs.readFileSync(`/var/www/clients/client0/web12/ssl/superheroes.jakubholecek.cz-le.key`),
+      cert: fs.readFileSync(`/var/www/clients/client0/web12/ssl/superheroes.jakubholecek.cz-le.crt`)
+    },
+  );
+
+  await new Promise(resolve => server.listen({ port: config.port }, resolve));
+  console.log(
+    '🚀 Server ready at',
+    `http${config.ssl ? 's' : ''}://${config.hostname}:${config.port}${server.graphqlPath}`
+  );
+  return { server };
+}
+
+startApolloServer();
 
 
+/*
+NODE_EXTRA_CA_CERTS=/var/www/superheroes.jakubholecek.cz/ssl/ \
+GLOBAL_AGENT_HTTP_PROXY=http://89.221.222.81:8000 \
+node server.js
+*/

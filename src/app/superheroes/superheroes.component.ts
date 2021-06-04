@@ -140,13 +140,13 @@ export class SuperheroesComponent implements OnInit, AfterViewInit {
   createSuperhero() {
       this.isCreateFormActive = true;      
       this.renderer.setStyle(this.form.nativeElement, 'visibility', 'visible');          
-      
+      /*
       this.setFirstName('Kuba');
       this.setLastName('Kubula');
       this.setSuperheroName('Kubulus');
       this.setDateOfBirth('11.12.1986');
       this.setSuperPowers('super coder'); 
-                        
+      */                  
   }
    
   confirmCreateSuperhero() {

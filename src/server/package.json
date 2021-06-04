@@ -1,3 +1,8 @@
 {
-    "name": "kuba"
+    "name": "kuba",
+    "dependencies": {
+        "apollo-server": "^2.25.0",
+        "global-agent": "^2.2.0",
+        "graphql": "^15.5.0"
+    }
 }
