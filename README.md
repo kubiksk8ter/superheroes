@@ -1,6 +1,5 @@
 # Superheroes
 Simple example of web aplication, for managing superheroes records with Graphql and Prisma database.<br>
-Please try this app on <a href='https://superheroes.jakubholecek.cz' target="_blank" rel="noopener noreferrer">superheroes.jakubholecek.cz</a>
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 10.1.7.
 
