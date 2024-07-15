@@ -1,5 +1,5 @@
 # Superheroes
-Simple example of web aplication, for managing superheroes records with Graphql and Prisma database.<br>
+Simple example of web aplication, for managing superheroes records with GraphQL and Prisma database.<br>
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 10.1.7.
 
